@@ -1,0 +1,59 @@
+大型程序编译：Makefile
+4.1.问：如果产品设计的源文件上万个并且位于不同的目录下,按照之前编译的方法：
+    gcc -o main main.c a.c b.c c.c ../d.c /home/tarena/e.c ....一万个.c ...
+	结论：要命！
+	问：如何简化编译呢？
+	答：必须利用大名鼎鼎的Makefile
+4.2.Makefile功能：本质就是一个文本文件,能够制定编译规则,将来程序的编译
+				  严格遵守规则进行编译,此文件给make命令使用
+				  make命令会解析此文件获取到编译规则然后启动程序的编译
+4.3.Makefile制定编译规则的语法
+	目标：依赖1 依赖2 ... 依赖N 
+	(TAB键)命令1
+	(TAB键)命令2 
+	...
+	(TAB键)命令N 
+	语义：根据命令将依赖文件编译生成目标文件
+	注意：注释用#
+	练习：利用Makefile编译helloworld.c 
+	mkdir /home/tarena/stdc/day14/Makefile -p
+	cd /home/tarena/stdc/day14/Makefile
+	vim helloworld.c 
+	vim Makefile 添加如下内容
+	#制定编译规则1
+	helloworld:helloworld.o 
+	(TAB键)gcc -o helloworld helloworld.o 
+	#制定编译规则2 
+	helloworld.o:helloworld.c 
+	(TAB键)gcc -c -o helloworld.o helloworld.c 
+	保存退出
+	make //执行make命令开始编译
+	ls 
+		helloworld helloworld.o helloworld.c 
+	./helloworld 
+	make //提示helloworld最新的"up to date",也就是helloworld并没有重新编译
+	vim helloworld.c 任意修改
+	make //发现此时重新编译helloworld.c 
+	./helloworld 
+	rm helloworld 
+	make
+	rm helloworld helloworld.o  
+	make 
+4.4.Makefile工作原理
+	当执行make命令时,make命令首先在当前目录下找Makefile,一旦找到之后
+	打开Makefile文件,确定最终的目标是helloworld,源文件是helloworld.c 
+	而helloworld.o作为中间临时生成的文件,然后make命令立马在当前目录下
+	找目标文件helloworld,如果没有找到,make命令运行gcc的编译命令
+	编译源文件,如果找到了,然后检查helloworld的时间戳和helloworld.c的
+	时间戳哪个更新,如果helloworld.c的时间戳要比helloworld新,
+	说明源文件修改过,需要编译,否则不用编译！
+	练习：给昨天写的shell程序添加Makefile来进行编译,参见shell目录
+	此Makefile缺陷：如果源文件的数量太多,Makefile编写极其繁琐
+	利用以下小技巧即可让.c编译生成对应的.o 
+	%.o:%.c
+	(TAB键)gcc -c -o $@ $<
+	%.o:目标文件.o 
+	%.c:源文件.c 
+	$@:目标文件 
+	$<:依赖文件 
+	参见shell1目录
